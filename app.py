@@ -2,6 +2,9 @@ import secrets
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import re
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 # usernames are received by the server as <123ABC>
 USRNAME_PATTERN = "<.+>"
@@ -33,9 +36,10 @@ def message_kill(context, say):
 
 @app.event("message")
 def handle_message_events(body, logger):
-    logger.info(body)
-    print("received the following message:")
-    print(body)
+    curr_channel = body['event']['channel']
+    app.client.chat_postMessage(channel=curr_channel, text="All users will be silenced in this channel for 15 seconds")
+    app.client.admin_conversations_setConversationPrefs(token=secrets.USR_ADMIN_TOKEN, channel_id=curr_channel, prefs={'who_can_post':''})
+    logger.debug(body)
 
 # Start your app
 if __name__ == "__main__":
