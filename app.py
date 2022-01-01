@@ -1,4 +1,3 @@
-from os import kill
 import secrets
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
@@ -49,13 +48,17 @@ def show_vote_results():
     total_votes_cast_by_voter = len(votes_by_voter.keys())
     
     if total_votes_cast_by_target == total_votes_cast_by_voter:
-        print("Vote count by voter is equal count by target! Hooray!")
+        print(f"Vote count ({total_votes_cast_by_target}) by voter is equal count by target! Hooray!")
     else:
         print(f"Uh Oh. By target, total number of votes was {total_votes_cast_by_target} but by voter it was {total_votes_cast_by_voter}.")
     print("END TALLY UPDATE")
     print()
 
-def update_vote_assignments(voter, target, vote_type):
+def update_vote_assignments(voter, target_name, vote_type):
+    # every player is really two targets
+    # (one for prayers and one for kills)
+    target = (target_name, vote_type)
+
     # previously cast a vote
     if voter in votes_by_voter.keys():
         old_target = votes_by_voter[voter]
@@ -64,7 +67,8 @@ def update_vote_assignments(voter, target, vote_type):
 
     # if voting_player NOT in votes_by_voter.keys(), then they
     # have not cast a vote today yet, so there's nothing to remove
-    # add them now
+
+    # add new vote
     votes_by_voter[voter] = target
 
     if target not in votes_by_target.keys():
@@ -108,8 +112,8 @@ def handle_prayer(ack, respond, command):
     # no check for which channel because praying is allowed anywhere
     # check that only 1 user specified
     if len(prayer_targets) == 1: 
-        respond(f"<@{praying_player}> is praying to {prayer_target}", response_type="in_channel")
-        update_prayer(praying_player, prayer_target)
+        respond(f"<@{praying_player}> is praying to {prayer_targets[0]}", response_type="in_channel")
+        update_prayer(praying_player, prayer_targets[0])
     else:
         respond("Try again - you didn't specify a valid player.")
 
