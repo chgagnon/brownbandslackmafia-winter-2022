@@ -93,7 +93,7 @@ def send_database_state_to_slack():
     slack_msg = "=======VOTE TALLY UPDATE=======\n"
 
     for vote_type in [PRAYER_STR, KILL_STR]:
-        slack_msg += f"-------*for vote type {vote_type.upper()}:*-------\n"
+        slack_msg += f"-------*for vote type {vote_type.upper()}*-------\n"
         conn = None
         try:
             """ query data from the votes table """
