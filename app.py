@@ -45,9 +45,11 @@ def show_vote_results():
         target_str = "TARGET: " + str(target)
         numvotes_str = "| VOTES: " + str(num_votes_for_this_target)
         print(target_str.ljust(85) + numvotes_str.rjust(14))
-        print("      voted by:")
+        print("    voted by:")
         for voter in votes_by_target[target]:
-            print(voter.rjust(85))
+            ident = app.client.users_identity(voter)
+            realname = ident['user']['name']
+            print("      " + realname)
         total_votes_cast_by_target += num_votes_for_this_target
     
     total_votes_cast_by_voter = len(votes_by_voter.keys())
