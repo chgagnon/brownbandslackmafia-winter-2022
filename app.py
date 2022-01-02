@@ -106,10 +106,10 @@ def send_database_state_to_slack():
             row = cur.fetchone()
 
             while row is not None:
-                target_str = f"TARGET: {row[0]}"
-                numvotes_str = f"| VOTES: {row[1]}"
+                target_str = f"*TARGET:* {row[0]}"
+                numvotes_str = f"| *VOTES:* {row[1]}"
                 slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
-                slack_msg += f"    votes from: {row[2]}"
+                slack_msg += f"    _brought to you by_: {row[2]}\n"
                 row = cur.fetchone()
             
             cur.close()
