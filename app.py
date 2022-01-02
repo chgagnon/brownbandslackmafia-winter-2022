@@ -62,7 +62,7 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
 
     """ insert a new vote into the votes_by_target table """
     sql = """INSERT INTO vote_by_target(target_name, voter_name, vote_type)
-             VALUES(%s)
+             VALUES(%s, %s, %s)
              ON CONFLICT (voter_name)
              DO NOTHING;"""
     conn = None
