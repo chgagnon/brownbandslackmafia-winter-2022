@@ -60,11 +60,14 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
         assert(vote_type == VoteType.PRAYER)
         vote_type = 'prayer'
 
-    """ insert a new vote into the votes_by_target table """
-    sql = """INSERT INTO votes_by_target(target_name, voter_name, vote_type)
+    """ insert a new vote into the votes table """
+    sql = """INSERT INTO votes(target_name, voter_name, vote_type)
              VALUES(%s, %s, %s)
              ON CONFLICT (voter_name)
-             DO NOTHING;"""
+             DO UPDATE
+                SET target_name = excluded.target_name
+                    vote_type = excluded.vote_type
+                    votecast_time = excluded.votecast_time;"""
     conn = None
     try:
         # connect to the PostgreSQL database
