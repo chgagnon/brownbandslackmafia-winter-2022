@@ -64,7 +64,7 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
         vote_type = PRAYER_STR
 
     """ insert a new vote into the votes table """
-    sql = """INSERT INTO votes(target_name, voter_name, vote_type)
+    sql = """INSERT INTO votes(target_name, voter_name, vote_type, voter_user_id)
              VALUES(%s, %s, %s, %s)
              ON CONFLICT (voter_name)
              DO UPDATE
