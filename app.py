@@ -1,4 +1,4 @@
-import secrets
+import os
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import re
@@ -29,7 +29,7 @@ votes_by_target = {}
 votes_by_voter = {}
 
 # Initializes your app with your bot token and socket mode handler
-app = App(token=secrets.SLACK_BOT_TOKEN)
+app = App(token=os.environ.get('SLACK_BOT_TOKEN'))
 
 @app.event("app_mention")
 def action_button_click(event, say):
@@ -119,4 +119,4 @@ def handle_prayer(ack, respond, command):
 
 # Start your app
 if __name__ == "__main__":
-    SocketModeHandler(app, secrets.SLACK_APP_TOKEN).start()
+    SocketModeHandler(app, os.environ.get('SLACK_APP_TOKEN').start())
