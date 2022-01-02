@@ -4,6 +4,7 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 import re
 import logging
 from enum import Enum
+import psycopg2
 
 class VoteType(Enum):
     PRAYER = 1
@@ -19,6 +20,36 @@ KILL_PREFIX_LEN = len(KILL_CMD_PREFIX)
 KILL_COMMAND = KILL_CMD_PREFIX + USRNAME_PATTERN
 
 MAIN_CHANNEL_NAME = "main_chat"
+
+def connect():
+    """ Connect to the PostgreSQL database server """
+    conn = None
+    try:
+        # read connection parameters
+
+        # connect to the PostgreSQL server
+        print('Connecting to the PostgreSQL database...')
+        conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
+		
+        # create a cursor
+        cur = conn.cursor()
+        
+	# execute a statement
+        print('PostgreSQL database version:')
+        cur.execute('SELECT version()')
+
+        # display the PostgreSQL database server version
+        db_version = cur.fetchone()
+        print(db_version)
+       
+	# close the communication with the PostgreSQL
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+            print('Database connection closed.')
 
 # global data that tracks voting results
 # dictionary with target_player as keys
@@ -134,4 +165,5 @@ def handle_prayer(ack, respond, command):
 
 # Start your app
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 3000)))
+    connect()
+    # app.start(port=int(os.environ.get("PORT", 3000)))
