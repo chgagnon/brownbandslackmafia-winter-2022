@@ -65,8 +65,8 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
              VALUES(%s, %s, %s)
              ON CONFLICT (voter_name)
              DO UPDATE
-                SET target_name = excluded.target_name
-                    vote_type = excluded.vote_type
+                SET target_name = excluded.target_name,
+                    vote_type = excluded.vote_type,
                     votecast_time = excluded.votecast_time;"""
     conn = None
     try:
