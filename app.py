@@ -54,7 +54,7 @@ def test_database_connection():
             print('Database connection closed.')
 
 def cast_vote_to_database(voter_id, target_name, vote_type):
-    _, voter_name = translate_user_id_to_name(voter_id)
+    voter_user_id, voter_name = translate_user_id_to_name(voter_id)
 
     # convert from Python enum to PostGres enum
     if vote_type == VoteType.KILL:
@@ -65,12 +65,13 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
 
     """ insert a new vote into the votes table """
     sql = """INSERT INTO votes(target_name, voter_name, vote_type)
-             VALUES(%s, %s, %s)
+             VALUES(%s, %s, %s, %s)
              ON CONFLICT (voter_name)
              DO UPDATE
                 SET target_name = excluded.target_name,
                     vote_type = excluded.vote_type,
-                    votecast_time = excluded.votecast_time;"""
+                    votecast_time = excluded.votecast_time,
+                    voter_user_id = excluded.voter_user_id;"""
     conn = None
     try:
         # connect to the PostgreSQL database
@@ -78,7 +79,7 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
         # create a new cursor
         cur = conn.cursor()
         # execute the INSERT statement
-        cur.execute(sql, (target_name, voter_name, vote_type))
+        cur.execute(sql, (target_name, voter_name, vote_type, voter_user_id))
         # commit the changes to the database
         conn.commit()
         # close communication with the database
@@ -99,7 +100,7 @@ def send_database_state_to_slack():
             """ query data from the votes table """
             conn = psycopg2.connect(os.environ["DATABASE_URL"])
             cur = conn.cursor()
-            cur.execute(f"SELECT target_name, COUNT(*) as mycount, string_agg(voter_name, ', ') FROM votes WHERE vote_type = '{vote_type}' GROUP BY target_name ORDER BY mycount desc")
+            cur.execute(f"SELECT target_name, COUNT(*) as mycount, string_agg(voter_user_id, ', ') FROM votes WHERE vote_type = '{vote_type}' GROUP BY target_name ORDER BY mycount desc")
             
             print("Posting {vote_type.upper()} vote tally with total number of targets: ", cur.rowcount)
             
@@ -109,7 +110,7 @@ def send_database_state_to_slack():
                 target_str = f"*TARGET:* {row[0]}"
                 numvotes_str = f"| *VOTES:* {row[1]}"
                 slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
-                slack_msg += f"    _brought to you by_: {row[2]}\n"
+                slack_msg += f"    _brought to you by_: <{row[2]}>\n"
                 row = cur.fetchone()
             
             cur.close()
