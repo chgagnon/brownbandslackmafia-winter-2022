@@ -60,7 +60,7 @@ def show_vote_results():
     total_votes_cast_by_voter = len(votes_by_voter.keys())
     
     if total_votes_cast_by_target == total_votes_cast_by_voter:
-        print(f"Vote count ({total_votes_cast_by_target}) by voter is equal count by target! Hooray!")
+        print(f"\nVote count ({total_votes_cast_by_target}) by voter is equal count by target! Hooray!")
     else:
         print(f"Uh Oh. By target, total number of votes was {total_votes_cast_by_target} but by voter it was {total_votes_cast_by_voter}.")
     print("END TALLY UPDATE")
