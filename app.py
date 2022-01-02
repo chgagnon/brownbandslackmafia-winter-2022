@@ -54,8 +54,7 @@ def show_vote_results():
         print(target_str.ljust(85) + numvotes_str.rjust(14))
         print("    voted by:")
         for voter in votes_by_target[target]:
-            realname = translate_user_id_to_name(voter)
-            print("      " + realname)
+            print("      " + voter)
         total_votes_cast_by_target += num_votes_for_this_target
     
     total_votes_cast_by_voter = len(votes_by_voter.keys())
@@ -67,7 +66,9 @@ def show_vote_results():
     print("END TALLY UPDATE")
     print()
 
-def update_vote_assignments(voter, target_name, vote_type):
+def update_vote_assignments(voter_user_id, target_name, vote_type):
+    voter = translate_user_id_to_name(voter_user_id)
+    
     # every player is really two targets
     # (one for prayers and one for kills)
     target = (target_name, vote_type)
