@@ -90,10 +90,10 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
             conn.close()
 
 def send_database_state_to_slack():
-    slack_msg = "VOTE TALLY UPDATE:\n"
+    slack_msg = "=======VOTE TALLY UPDATE=======\n"
 
     for vote_type in [PRAYER_STR, KILL_STR]:
-        slack_msg += f"for vote type {vote_type.upper()}:\n"
+        slack_msg += f"-------*for vote type {vote_type.upper()}:*-------\n"
         conn = None
         try:
             """ query data from the votes table """
@@ -136,55 +136,6 @@ def translate_user_id_to_name(user_id):
         if user['id'] == user_id:
             return (user['id'], user['real_name'])
     return ('aw shucks', 'could not find a user name for this user ID')
-
-def show_vote_results():
-    print()
-    print("VOTE TALLY UPDATE:")
-    print()
-    total_votes_cast_by_target = 0
-    for target in votes_by_target.keys():
-        num_votes_for_this_target = len(votes_by_target[target])
-        target_str = "TARGET: " + str(target)
-        numvotes_str = "| VOTES: " + str(num_votes_for_this_target)
-        print(target_str.ljust(85) + numvotes_str.rjust(14))
-        print("    voted by:")
-        for voter in votes_by_target[target]:
-            print("      " + voter, end=", ")
-        total_votes_cast_by_target += num_votes_for_this_target
-    
-    total_votes_cast_by_voter = len(votes_by_voter.keys())
-    
-    if total_votes_cast_by_target == total_votes_cast_by_voter:
-        print(f"\nVote count ({total_votes_cast_by_target}) by voter is equal count by target! Hooray!")
-    else:
-        print(f"Uh Oh. By target, total number of votes was {total_votes_cast_by_target} but by voter it was {total_votes_cast_by_voter}.")
-    print("END TALLY UPDATE")
-    print()
-
-def update_vote_assignments(voter_user_id, target_name, vote_type):
-    _, voter = translate_user_id_to_name(voter_user_id)
-    
-    # every player is really two targets
-    # (one for prayers and one for kills)
-    target = (target_name, vote_type)
-
-    # previously cast a vote
-    if voter in votes_by_voter.keys():
-        old_target = votes_by_voter[voter]
-        votes_by_target[old_target].remove(voter)
-        assert(voter not in votes_by_target[old_target])
-
-    # if voting_player NOT in votes_by_voter.keys(), then they
-    # have not cast a vote today yet, so there's nothing to remove
-
-    # add new vote
-    votes_by_voter[voter] = target
-
-    if target not in votes_by_target.keys():
-        # make new list of voters for this target
-        votes_by_target[target] = [voter]
-    else:
-        votes_by_target[target].append(voter)
 
 def update_kill_vote(voting_player, target_player):
     # update_vote_assignments(voting_player, target_player, VoteType.KILL) 
