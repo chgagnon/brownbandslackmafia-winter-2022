@@ -21,20 +21,18 @@ KILL_COMMAND = KILL_CMD_PREFIX + USRNAME_PATTERN
 
 MAIN_CHANNEL_NAME = "main_chat"
 
-def connect():
+def test_database_connection():
     """ Connect to the PostgreSQL database server """
     conn = None
     try:
-        # read connection parameters
-
         # connect to the PostgreSQL server
         print('Connecting to the PostgreSQL database...')
         conn = psycopg2.connect(os.environ['DATABASE_URL'], sslmode='require')
-		
+        
         # create a cursor
         cur = conn.cursor()
         
-	# execute a statement
+    # execute a statement
         print('PostgreSQL database version:')
         cur.execute('SELECT version()')
 
@@ -42,7 +40,7 @@ def connect():
         db_version = cur.fetchone()
         print(db_version)
        
-	# close the communication with the PostgreSQL
+    # close the communication with the PostgreSQL
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -51,13 +49,39 @@ def connect():
             conn.close()
             print('Database connection closed.')
 
-# global data that tracks voting results
-# dictionary with target_player as keys
-# values are list of voting players
-votes_by_target = {}
-# dictionary with voting_player as keys
-# values are single targeted player
-votes_by_voter = {}
+def cast_vote_to_database(voter_id, target_name, vote_type):
+    _, voter_name = translate_user_id_to_name(voter_id)
+
+
+    # convert from Python enum to PostGres enum
+    if vote_type == VoteType.KILL:
+        vote_type = 'kill'
+    else:
+        assert(vote_type == VoteType.PRAYER)
+        vote_type = 'prayer'
+
+    """ insert a new vote into the votes_by_target table """
+    sql = """INSERT INTO vote_by_target(target_name, voter_name, vote_type)
+             VALUES(%s)
+             ON CONFLICT (voter_name)
+             DO NOTHING;"""
+    conn = None
+    try:
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.execute(sql, (target_name, voter_name, vote_type))
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
 
 # Initializes your app with your bot token and socket mode handler
 app = App(token=os.environ.get('SLACK_BOT_TOKEN'), signing_secret=os.environ.get("SLACK_SIGNING_SECRET"))
@@ -70,8 +94,8 @@ def translate_user_id_to_name(user_id):
     users_list = app.client.users_list(token=os.environ.get("SLACK_BOT_TOKEN"))
     for user in users_list['members']:
         if user['id'] == user_id:
-            return user['real_name']
-    return 'could not find a user name for this user ID'
+            return (user['id'], user['real_name'])
+    return ('aw shucks', 'could not find a user name for this user ID')
 
 def show_vote_results():
     print()
@@ -98,7 +122,7 @@ def show_vote_results():
     print()
 
 def update_vote_assignments(voter_user_id, target_name, vote_type):
-    voter = translate_user_id_to_name(voter_user_id)
+    _, voter = translate_user_id_to_name(voter_user_id)
     
     # every player is really two targets
     # (one for prayers and one for kills)
@@ -123,8 +147,9 @@ def update_vote_assignments(voter_user_id, target_name, vote_type):
         votes_by_target[target].append(voter)
 
 def update_kill_vote(voting_player, target_player):
-    update_vote_assignments(voting_player, target_player, VoteType.KILL) 
-    show_vote_results()
+    # update_vote_assignments(voting_player, target_player, VoteType.KILL) 
+    # show_vote_results()
+    cast_vote_to_database(voting_player, target_player, VoteType.KILL)
 
 @app.command("/kill")
 def handle_kill_vote(ack, respond, command):
@@ -145,8 +170,9 @@ def handle_kill_vote(ack, respond, command):
             respond("Try again - you didn't specify a valid player.")
 
 def update_prayer(praying_player, prayer_target):
-    update_vote_assignments(praying_player, prayer_target, VoteType.PRAYER)
-    show_vote_results()
+    # update_vote_assignments(praying_player, prayer_target, VoteType.PRAYER)
+    # show_vote_results()
+    cast_vote_to_database(praying_player, prayer_target, VoteType.PRAYER)
 
 @app.command("/prayto")
 def handle_prayer(ack, respond, command):
@@ -165,5 +191,5 @@ def handle_prayer(ack, respond, command):
 
 # Start your app
 if __name__ == "__main__":
-    connect()
-    # app.start(port=int(os.environ.get("PORT", 3000)))
+    # test_database_connection()
+    app.start(port=int(os.environ.get("PORT", 3000)))

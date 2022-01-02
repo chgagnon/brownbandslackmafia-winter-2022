@@ -4,3 +4,4 @@ __pycache__/
 bolt-venv/
 elrod.jpg
 database.ini
+.env
