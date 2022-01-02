@@ -193,3 +193,4 @@ def handle_prayer(ack, respond, command):
 if __name__ == "__main__":
     # test_database_connection()
     app.start(port=int(os.environ.get("PORT", 3000)))
+    print('started up the Bolt server')
