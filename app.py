@@ -42,7 +42,9 @@ def show_vote_results():
     total_votes_cast_by_target = 0
     for target in votes_by_target.keys():
         num_votes_for_this_target = len(votes_by_target[target])
-        print("TARGET:", target, " | VOTES:", num_votes_for_this_target)
+        target_str = "TARGET: " + target
+        numvotes_str = "| VOTES: " + str(num_votes_for_this_target)
+        print(target_str.ljust(90) + numvotes_str.rjust(14))
         total_votes_cast_by_target += num_votes_for_this_target
     
     total_votes_cast_by_voter = len(votes_by_voter.keys())
