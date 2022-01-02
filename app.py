@@ -99,7 +99,7 @@ def send_database_state_to_slack():
             """ query data from the votes table """
             conn = psycopg2.connect(os.environ["DATABASE_URL"])
             cur = conn.cursor()
-            cur.execute(f"SELECT target_name, COUNT(*) FROM votes WHERE vote_type = '{vote_type}' ORDER BY target_name")
+            cur.execute(f"SELECT target_name, COUNT(*) FROM votes WHERE vote_type = '{vote_type}' GROUP BY target_name ORDER BY COUNT(*)"
             print("The number of targets: ", cur.rowcount)
             row = cur.fetchone()
 
