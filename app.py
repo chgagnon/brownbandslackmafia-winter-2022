@@ -35,6 +35,13 @@ app = App(token=os.environ.get('SLACK_BOT_TOKEN'), signing_secret=os.environ.get
 def action_button_click(event, say):
     say("dude what do you want")
 
+def translate_user_id_to_name(user_id):
+    users_list = app.client.users_list(token=os.environ.get("SLACK_BOT_TOKEN"))
+    for user in users_list['members']:
+        if user['id'] == user_id:
+            return user['real_name']
+    return 'could not find a user name for this user ID'
+
 def show_vote_results():
     print()
     print("VOTE TALLY UPDATE:")
@@ -47,8 +54,7 @@ def show_vote_results():
         print(target_str.ljust(85) + numvotes_str.rjust(14))
         print("    voted by:")
         for voter in votes_by_target[target]:
-            ident = app.client.users_identity(voter)
-            realname = ident['user']['name']
+            realname = translate_user_id_to_name(voter)
             print("      " + realname)
         total_votes_cast_by_target += num_votes_for_this_target
     
