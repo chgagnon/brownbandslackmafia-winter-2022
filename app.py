@@ -126,8 +126,9 @@ def handle_prayer(ack, respond, command):
     # no check for which channel because praying is allowed anywhere
     # check that only 1 user specified
     if len(prayer_targets) == 1: 
-        respond(f"<@{praying_player}> is praying to {prayer_targets[0]}", response_type="in_channel")
-        update_prayer(praying_player, prayer_targets[0].upper())
+        uppercase_target = prayer_targets[0].upper()
+        respond(f"<@{praying_player}> is praying to {uppercase_target}", response_type="in_channel")
+        update_prayer(praying_player, uppercase_target)
     else:
         respond("Try again - you didn't specify a valid player.")
 
