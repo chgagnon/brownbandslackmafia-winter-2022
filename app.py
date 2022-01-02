@@ -127,7 +127,7 @@ def handle_prayer(ack, respond, command):
     # check that only 1 user specified
     if len(prayer_targets) == 1: 
         respond(f"<@{praying_player}> is praying to {prayer_targets[0]}", response_type="in_channel")
-        update_prayer(praying_player, prayer_targets[0])
+        update_prayer(praying_player, prayer_targets[0].upper())
     else:
         respond("Try again - you didn't specify a valid player.")
 
