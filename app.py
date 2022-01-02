@@ -54,7 +54,7 @@ def show_vote_results():
         print(target_str.ljust(85) + numvotes_str.rjust(14))
         print("    voted by:")
         for voter in votes_by_target[target]:
-            print("      " + voter)
+            print("      " + voter, end=", ")
         total_votes_cast_by_target += num_votes_for_this_target
     
     total_votes_cast_by_voter = len(votes_by_voter.keys())
