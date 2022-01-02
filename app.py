@@ -29,7 +29,7 @@ votes_by_target = {}
 votes_by_voter = {}
 
 # Initializes your app with your bot token and socket mode handler
-app = App(token=os.environ.get('SLACK_BOT_TOKEN'))
+app = App(token=os.environ.get('SLACK_BOT_TOKEN'), signing_secret=os.environ.get("SLACK_SIGNING_SECRET"))
 
 @app.event("app_mention")
 def action_button_click(event, say):
@@ -119,4 +119,4 @@ def handle_prayer(ack, respond, command):
 
 # Start your app
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ.get('SLACK_APP_TOKEN')).start()
+    app.start(port=int(os.environ.get("PORT", 3000)))
