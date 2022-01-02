@@ -119,4 +119,4 @@ def handle_prayer(ack, respond, command):
 
 # Start your app
 if __name__ == "__main__":
-    SocketModeHandler(app, os.environ.get('SLACK_APP_TOKEN').start())
+    SocketModeHandler(app, os.environ.get('SLACK_APP_TOKEN')).start()
