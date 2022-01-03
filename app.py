@@ -71,7 +71,8 @@ def cast_vote_to_database(voter_id, target_name, vote_type):
                 SET target_name = excluded.target_name,
                     vote_type = excluded.vote_type,
                     votecast_time = excluded.votecast_time,
-                    voter_user_id = excluded.voter_user_id;"""
+                    voter_user_id = excluded.voter_user_id,
+                    voter_name = excluded.voter_name;"""
     conn = None
     try:
         # connect to the PostgreSQL database
