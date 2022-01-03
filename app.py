@@ -102,7 +102,7 @@ def send_database_state_to_slack():
             cur = conn.cursor()
             cur.execute(f"SELECT target_name, COUNT(*) as mycount, string_agg(voter_user_id, ', '), string_agg(voter_name, ', ') FROM votes WHERE vote_type = '{vote_type}' GROUP BY target_name ORDER BY mycount desc")
             
-            print("Posting {vote_type.upper()} vote tally with total number of targets: ", cur.rowcount)
+            print(f"Posting {vote_type.upper()} vote tally with total number of targets: ", cur.rowcount)
             
             row = cur.fetchone()
 
