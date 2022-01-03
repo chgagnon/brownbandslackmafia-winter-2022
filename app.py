@@ -110,7 +110,7 @@ def send_database_state_to_slack():
                 target_str = f"*TARGET:* {row[0]}"
                 numvotes_str = f"| *VOTES:* {row[1]}"
                 slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
-                slack_msg += f"    _brought to you by_: {''.join(['<@' + str(player_id) + '>' for player_id in row[2]])} (aka {row[3]})\n"
+                slack_msg += f"    _brought to you by_: {', '.join(['<@' + str(player_id) + '>' for player_id in row[2].split(", ")])} (aka {row[3]})\n"
                 row = cur.fetchone()
             
             cur.close()
