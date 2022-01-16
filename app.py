@@ -25,6 +25,10 @@ VOTE_RESULTS_CHANNEL_NAME = "vote-results"
 PRAYER_STR = 'prayer'
 KILL_STR = 'kill'
 
+# for tic tac toe game
+BOARD_HEIGHT = 3
+BOARD_WIDTH = 3
+
 def test_database_connection():
     """ Connect to the PostgreSQL database server """
     conn = None
@@ -184,6 +188,46 @@ def handle_prayer(ack, respond, command):
         update_prayer(praying_player, uppercase_target)
     else:
         respond("Try again - you didn't specify a valid player.")
+
+@app.command("/tictactoe")
+def handle_tictactoe(ack, respond, command):
+    ack()
+    move_data = command['text'].split()
+    if len(move_data) == 2:
+        row_num = int(move_data[0])
+        col_num = int(move_data[1])
+        if row_num >= 0 and row_num < BOARD_HEIGHT and col_num >= 0 and col_num < BOARD_WIDTH:
+            player = command['user_id']
+            make_tic_tac_toe_move(player, row_num, col_num, respond)
+        else:
+            respond("Try again - your move row and column were too large or too small.")
+    else:
+        respond("Try again - you didn't provide a move in proper format.")
+
+def make_tic_tac_toe_move(player, row_num, col_num, respond):
+    slack_msg = f"====CURRENT BOARD===\nLast move made by <@{player}>"
+    board_state = []
+    conn = None
+    try:
+        """ query data from the tic tac toe table """
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        cur = conn.cursor()
+        cur.execute(f"SELECT tic_tac_board FROM tictactoe")
+        
+        print("Getting existing tic tac toe board")
+        
+        row = cur.fetchone()
+
+        while row is not None:
+            board_state.append(row[0])
+            row = cur.fetchone()
+        
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
 
 # Start your app
 if __name__ == "__main__":
