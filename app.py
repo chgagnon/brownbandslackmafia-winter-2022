@@ -476,6 +476,8 @@ def reset_board_state():
                 SET tile_state = excluded.tile_state;"""
     )
     rows_to_insert = [(i, "OPEN") for i in range(BOARD_HEIGHT * BOARD_WIDTH)]
+    print("rows_to_insert has len", len(rows_to_insert))
+    print("rows to insert is", rows_to_insert)
     try:
         """set all board tiles to state OPEN"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
