@@ -289,7 +289,7 @@ def get_and_update_curr_move_team():
         """look up whether it is a turn for team X or team O and then update it"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
-        cur.execute(f"SELECT * FROM tictac_curr_team;")
+        cur.execute(f"SELECT * FROM tic_tac_curr_team;")
 
         print("Getting team for current move")
 
