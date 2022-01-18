@@ -396,7 +396,7 @@ def record_win(player):
 def update_board_state(row_num, col_num, curr_move):
     conn = None
     try:
-        """record 1 additional tic tac toe win for player"""
+        """record new state induced by current move"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
         sql = """INSERT INTO tic_tac_board(tile_state, square_id)
@@ -445,6 +445,39 @@ def get_board_str(board_state):
     separator = "|"
     board_str = separator.join(board_tiles)
     return board_str
+
+
+def reset_board_state():
+    conn = None
+    values_str = "(%s, %s)" * BOARD_WIDTH * BOARD_HEIGHT
+    sql = (
+        """INSERT INTO tic_tac_board(tile_state, square_id)
+             VALUES """
+        + values_str
+        + """ON CONFLICT (square_id)
+             DO UPDATE
+                SET tile_state = excluded.tile_state;"""
+    )
+    rows_to_insert = [(i, "OPEN") for i in range(BOARD_HEIGHT * BOARD_WIDTH)]
+    try:
+        """set all board tiles to state OPEN"""
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        cur = conn.cursor()
+        cur.execute(sql, rows_to_insert)
+
+        # commit the changes to the database
+        conn.commit()
+
+        print(
+            f"Updating board state at row {row_num} and col {col_num} to be {curr_move}"
+        )
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
 
 
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
