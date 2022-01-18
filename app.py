@@ -250,6 +250,16 @@ def handle_tictacmove(ack, respond, command):
         else:
             respond("Try again - you didn't provide a move in proper format.")
 
+# used for debugging the reset function - this slack command
+# will be disabled before the app is put to use by the public
+@app.command("/restart-tic-tac")
+def handle_tic_tac_restart(ack, respond, command):
+    ack()
+    if command["channel_name"] != TIC_TAC_CHANNEL_NAME:
+        respond("You can't do that in this channel.")
+    else:
+        reset_board_state()
+        respond("Board should be reset now.")
 
 def convert_move_str_to_enum(move_str):
     if move_str == "OPEN":
