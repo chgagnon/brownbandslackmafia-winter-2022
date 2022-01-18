@@ -361,7 +361,7 @@ def check_for_win(board_state):
 def record_win(player):
     conn = None
     try:
-        """record 1 tic tac toe win for player"""
+        """record 1 additional tic tac toe win for player"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
         sql = """INSERT INTO tic_tac_win(player_id, num_wins)
@@ -389,17 +389,51 @@ def record_win(player):
         if conn is not None:
             conn.close()
 
+def update_board_state(row_num, col_num, curr_move):
+    conn = None
+    try:
+        """record 1 additional tic tac toe win for player"""
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        cur = conn.cursor()
+        sql = """INSERT INTO tic_tac_board(tile_state, square_id)
+             VALUES(%s, %s)
+             ON CONFLICT (square_id)
+             DO UPDATE
+                SET tile_state = excluded.tile_state;"""
+        cur.execute(sql, [curr_move, 1])
+
+        # commit the changes to the database
+        conn.commit()
+
+        print("Recording a win for {player}")
+
+        row = cur.fetchone()
+
+        while row is not None:
+            curr_team_str = row[0]
+            row = cur.fetchone()
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+def convert_move_enum_to_str(tile):
+    if tile == TicTacMove.OPEN:
+            return "_"
+    elif tile == TicTacMove.X:
+        return "X"
+    elif tile == TicTacMove.O:
+        return "O"
+    else:
+        print("ERROR: When constructing board string, a tile was neither X nor O nor OPEN")
+
 def get_board_str(board_state):
     board_tiles = []
     for index, tile in enumerate(board_state):
-        if tile == TicTacMove.OPEN:
-            board_tiles.append("_")
-        elif tile == TicTacMove.X:
-            board_tiles.append("X")
-        elif tile == TicTacMove.O:
-            board_tiles.append("O")
-        else:
-            print("ERROR: When constructing board string, a tile was neither X nor O nor OPEN")
+        board_tiles.append(convert_move_enum_to_str(tile))
         if index in [2, 5, 8]:
             board_tiles[-1] += "\n"
     separator = "|"
@@ -415,7 +449,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
         """query data from the tic tac toe table"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
-        cur.execute(f"SELECT tic_tac_board FROM tictactoe ORDER BY square_id ASC")
+        cur.execute(f"SELECT tile_state FROM tic_tac_board ORDER BY square_id ASC")
 
         print("Getting existing tic tac toe board")
 
