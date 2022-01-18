@@ -374,7 +374,7 @@ def record_win(player):
         # commit the changes to the database
         conn.commit()
 
-        print("Recording a win for {player}")
+        print(f"Recording a win for {player}")
 
         row = cur.fetchone()
 
@@ -400,12 +400,12 @@ def update_board_state(row_num, col_num, curr_move):
              ON CONFLICT (square_id)
              DO UPDATE
                 SET tile_state = excluded.tile_state;"""
-        cur.execute(sql, [curr_move, 1])
+        cur.execute(sql, [convert_move_enum_to_str(curr_move), row_num * BOARD_WIDTH + col_num])
 
         # commit the changes to the database
         conn.commit()
 
-        print("Recording a win for {player}")
+        print(f"Updating board state at row {row_num} and col {col_num} to be {curr_move}")
 
         row = cur.fetchone()
 
@@ -485,11 +485,11 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     # reset the (database) board state
                     reset_board_state()
                     # print a blank board to the chat
-                    slack_msg += "<@{player}> won the previous game."
+                    slack_msg += f"<@{player}> won the previous game."
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg)
                 else:
-                    slack_msg += "Last move made by <@{player}>\n"
+                    slack_msg += f"Last move made by <@{player}>\n"
                     # add a tile and print out the new board
                     update_board_state(row_num, col_num, curr_move)
                     board_str = get_board_str(board_state)
