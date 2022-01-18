@@ -38,7 +38,7 @@ KILL_STR = "kill"
 # for tic tac toe game
 BOARD_HEIGHT = 3
 BOARD_WIDTH = 3
-BLANK_BOARD_STR = "This is a new game.\n_|_|_\n_|_|_\n | | "
+BLANK_BOARD_STR = "This is a new game.\n`_|_|_\n_|_|_\n | | `"
 TIC_TAC_CHANNEL_NAME = "tic-tac-toe-test"
 
 def test_database_connection():
@@ -450,7 +450,7 @@ def get_board_str(board_state):
             board_tiles[-1] += "\n"
     separator = "|"
     board_str = separator.join(board_tiles)
-    return board_str
+    return "`" + board_str + "`"
 
 
 def reset_board_state():
