@@ -444,6 +444,7 @@ def get_board_str(board_state):
     for index, tile in enumerate(board_state):
         board_tiles.append(convert_move_enum_to_str(tile))
         if index in [2, 5, 8]:
+            print("board_tiles is", board_tiles)
             board_tiles[-1] += "\n"
     separator = "|"
     board_str = separator.join(board_tiles)
