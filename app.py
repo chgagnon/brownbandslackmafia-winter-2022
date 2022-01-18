@@ -258,6 +258,7 @@ def convert_move_str_to_enum(move_str):
     else:
         print("ERROR: move_str was none of the permitted types")
 
+
 def update_curr_move_team(team_letter_str):
     conn = None
     sql = """UPDATE tictac_curr_team
@@ -276,6 +277,7 @@ def update_curr_move_team(team_letter_str):
     finally:
         if conn is not None:
             conn.close()
+
 
 def get_and_update_curr_move_team():
     conn = None
@@ -358,6 +360,7 @@ def check_for_win(board_state):
         ]
     )
 
+
 def record_win(player):
     conn = None
     try:
@@ -389,6 +392,7 @@ def record_win(player):
         if conn is not None:
             conn.close()
 
+
 def update_board_state(row_num, col_num, curr_move):
     conn = None
     try:
@@ -400,18 +404,16 @@ def update_board_state(row_num, col_num, curr_move):
              ON CONFLICT (square_id)
              DO UPDATE
                 SET tile_state = excluded.tile_state;"""
-        cur.execute(sql, [convert_move_enum_to_str(curr_move), row_num * BOARD_WIDTH + col_num])
+        cur.execute(
+            sql, [convert_move_enum_to_str(curr_move), row_num * BOARD_WIDTH + col_num]
+        )
 
         # commit the changes to the database
         conn.commit()
 
-        print(f"Updating board state at row {row_num} and col {col_num} to be {curr_move}")
-
-        row = cur.fetchone()
-
-        while row is not None:
-            curr_team_str = row[0]
-            row = cur.fetchone()
+        print(
+            f"Updating board state at row {row_num} and col {col_num} to be {curr_move}"
+        )
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -420,15 +422,19 @@ def update_board_state(row_num, col_num, curr_move):
         if conn is not None:
             conn.close()
 
+
 def convert_move_enum_to_str(tile):
     if tile == TicTacMove.OPEN:
-            return "_"
+        return "_"
     elif tile == TicTacMove.X:
         return "X"
     elif tile == TicTacMove.O:
         return "O"
     else:
-        print("ERROR: When constructing board string, a tile was neither X nor O nor OPEN")
+        print(
+            "ERROR: When constructing board string, a tile was neither X nor O nor OPEN"
+        )
+
 
 def get_board_str(board_state):
     board_tiles = []
@@ -439,6 +445,7 @@ def get_board_str(board_state):
     separator = "|"
     board_str = separator.join(board_tiles)
     return board_str
+
 
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
     slack_msg = f"====CURRENT BOARD===\n"
@@ -475,7 +482,6 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
             else:
                 curr_move = get_and_update_curr_move_team()
                 board_state[board_index] = curr_move
-
 
                 # winner currently not used because X and O team assignments don't matter
                 whether_won, winner = check_for_win(board_state)
