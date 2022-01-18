@@ -469,7 +469,7 @@ def reset_board_state():
         conn.commit()
 
         print(
-            f"Updating board state at row {row_num} and col {col_num} to be {curr_move}"
+            "Resetting board state for a new game"
         )
 
         cur.close()
