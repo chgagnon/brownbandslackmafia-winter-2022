@@ -307,10 +307,12 @@ def get_and_update_curr_move_team():
             conn.close()
 
         if curr_team_str == "X":
-            update_curr_move_team("X")
+            print(f"Current team is {curr_team_str}")
+            update_curr_move_team("O")
             return TicTacMove.X
         elif curr_team_str == "O":
-            update_curr_move_team("O")
+            print(f"Current team is {curr_team_str}")
+            update_curr_move_team("X")
             return TicTacMove.O
         else:
             print("ERROR: constructed move type was neither X nor O")
