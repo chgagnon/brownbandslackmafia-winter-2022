@@ -39,7 +39,7 @@ KILL_STR = "kill"
 BOARD_HEIGHT = 3
 BOARD_WIDTH = 3
 BLANK_BOARD_STR = "This is a new game.\n_|_|_\n_|_|_\n | | "
-
+TIC_TAC_CHANNEL_NAME = "tic-tac-toe-test"
 
 def test_database_connection():
     """Connect to the PostgreSQL database server"""
@@ -230,22 +230,25 @@ def handle_prayer(ack, respond, command):
 @app.command("/tictacmove")
 def handle_tictacmove(ack, respond, command):
     ack()
-    move_data = command["text"].split()
-    if len(move_data) == 2:
-        row_num = int(move_data[0])
-        col_num = int(move_data[1])
-        if (
-            row_num >= 0
-            and row_num < BOARD_HEIGHT
-            and col_num >= 0
-            and col_num < BOARD_WIDTH
-        ):
-            player = command["user_id"]
-            make_tic_tac_toe_move(player, row_num, col_num, respond)
-        else:
-            respond("Try again - your move row and column were too large or too small.")
+    if command["channel_name"] != TIC_TAC_CHANNEL_NAME:
+        respond("You can't do that in this channel.")
     else:
-        respond("Try again - you didn't provide a move in proper format.")
+        move_data = command["text"].split()
+        if len(move_data) == 2:
+            row_num = int(move_data[0])
+            col_num = int(move_data[1])
+            if (
+                row_num >= 0
+                and row_num < BOARD_HEIGHT
+                and col_num >= 0
+                and col_num < BOARD_WIDTH
+            ):
+                player = command["user_id"]
+                make_tic_tac_toe_move(player, row_num, col_num, respond)
+            else:
+                respond("Try again - your move row and column were too large or too small.")
+        else:
+            respond("Try again - you didn't provide a move in proper format.")
 
 
 def convert_move_str_to_enum(move_str):
