@@ -389,6 +389,23 @@ def record_win(player):
         if conn is not None:
             conn.close()
 
+def get_board_str(board_state):
+    board_tiles = []
+    for index, tile in enumerate(board_state):
+        if tile == TicTacMove.OPEN:
+            board_tiles.append("_")
+        elif tile == TicTacMove.X:
+            board_tiles.append("X")
+        elif tile == TicTacMove.O:
+            board_tiles.append("O")
+        else:
+            print("ERROR: When constructing board string, a tile was neither X nor O nor OPEN")
+        if index in [2, 5, 8]:
+            board_tiles[-1] += "\n"
+    separator = "|"
+    board_str = separator.join(board_tiles)
+    return board_str
+
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
     slack_msg = f"====CURRENT BOARD===\n"
     board_state = []
@@ -437,7 +454,6 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     slack_msg += "<@{player}> won the previous game."
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg)
-                    pass
                 else:
                     slack_msg += "Last move made by <@{player}>\n"
                     # add a tile and print out the new board
