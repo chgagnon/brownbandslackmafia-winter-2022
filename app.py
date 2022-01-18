@@ -529,14 +529,14 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     # print a blank board to the chat
                     slack_msg += f"<@{player}> won the previous game."
                     slack_msg += BLANK_BOARD_STR
-                    respond(slack_msg)
+                    respond(slack_msg, response_type="in_channel")
                 else:
                     slack_msg += f"Last move made by <@{player}>\n"
                     # add a tile and print out the new board
                     update_board_state(row_num, col_num, curr_move)
                     board_str = get_board_str(board_state)
                     slack_msg += board_str
-                    respond(slack_msg)
+                    respond(slack_msg, response_type="in_channel")
 
 
 # Start your app
