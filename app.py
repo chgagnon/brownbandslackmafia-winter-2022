@@ -259,7 +259,7 @@ def convert_move_str_to_enum(move_str):
     elif move_str == "O":
         return TicTacMove.O
     else:
-        print("ERROR: move_str was none of the permitted types")
+        print(f"ERROR: move_str was none of the permitted types - it was instead {move_str}")
 
 
 def update_curr_move_team(team_letter_str):
