@@ -376,7 +376,7 @@ def record_win(player):
              VALUES(%s, %s)
              ON CONFLICT (player_id)
              DO UPDATE
-                SET num_wins = num_wins + 1;"""
+                SET num_wins = tic_tac_win.num_wins + 1;"""
         cur.execute(sql, [player, 1])
 
         # commit the changes to the database
@@ -454,8 +454,9 @@ def get_board_str(board_state):
 
 
 def reset_board_state():
+    print("Reached beginning of func reset_board_state()")
     conn = None
-    values_str = "(%s, %s)" * BOARD_WIDTH * BOARD_HEIGHT
+    values_str = "(%s, %s)," * BOARD_WIDTH * BOARD_HEIGHT
     sql = (
         """INSERT INTO tic_tac_board(tile_state, square_id)
              VALUES """
