@@ -476,8 +476,13 @@ def reset_board_state():
                 SET tile_state = excluded.tile_state;"""
     )
     rows_to_insert = [(i, "OPEN") for i in range(BOARD_HEIGHT * BOARD_WIDTH)]
+    values_to_insert = []
+    for i in rows_to_insert:
+        values_to_insert.append(i[0])
+        values_to_insert.append(i[1])
     print("rows_to_insert has len", len(rows_to_insert))
     print("rows to insert is", rows_to_insert)
+    print("values to insert is", values_to_insert)
     print("sql str is", sql)
     try:
         """set all board tiles to state OPEN"""
