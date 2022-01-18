@@ -272,7 +272,7 @@ def update_curr_move_team(team_letter_str):
         cur.execute(sql, [team_letter_str])
         conn.commit()
 
-        print("Updating curr team to be {team_letter_str}")
+        print(f"Updating curr team to be {team_letter_str}")
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -528,7 +528,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     # reset the (database) board state
                     reset_board_state()
                     # print a blank board to the chat
-                    slack_msg += f"<@{player}> won the previous game."
+                    slack_msg += f"<@{player}> won the previous game.\n"
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
                 else:
