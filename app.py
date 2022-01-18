@@ -264,7 +264,7 @@ def convert_move_str_to_enum(move_str):
 
 def update_curr_move_team(team_letter_str):
     conn = None
-    sql = """UPDATE tictac_curr_team
+    sql = """UPDATE tic_tac_curr_team
                 SET letter = %s;"""
     try:
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
