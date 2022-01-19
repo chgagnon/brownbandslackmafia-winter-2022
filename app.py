@@ -488,7 +488,7 @@ def reset_board_state():
         """set all board tiles to state OPEN"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
-        cur.execute(sql, rows_to_insert)
+        cur.execute(sql, values_to_insert)
 
         # commit the changes to the database
         conn.commit()
