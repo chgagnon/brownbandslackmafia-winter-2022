@@ -19,6 +19,14 @@ class TicTacMove(Enum):
     X = 2
     O = 3
 
+    @staticmethod
+    def get_opposite(e):
+        if e == TicTacMove.X:
+            return TicTacMove.O
+        elif e == TicTacMove.O:
+            return TicTacMove.X
+        else:
+            return TicTacMove.OPEN
 
 logging.basicConfig(level=logging.INFO)
 
@@ -417,7 +425,7 @@ def record_win(player):
             conn.close()
 
 
-def update_board_state(row_num, col_num, curr_move):
+def update_board_state(row_num, col_num, curr_team):
     conn = None
     try:
         """record new state induced by current move"""
@@ -429,14 +437,14 @@ def update_board_state(row_num, col_num, curr_move):
              DO UPDATE
                 SET tile_state = excluded.tile_state;"""
         cur.execute(
-            sql, [convert_move_enum_to_str(curr_move), row_num * BOARD_WIDTH + col_num]
+            sql, [convert_move_enum_to_str(curr_team), row_num * BOARD_WIDTH + col_num]
         )
 
         # commit the changes to the database
         conn.commit()
 
         print(
-            f"Updating board state at row {row_num} and col {col_num} to be {curr_move}"
+            f"Updating board state at row {row_num} and col {col_num} to be {curr_team}"
         )
 
         cur.close()
@@ -515,7 +523,6 @@ def reset_board_state():
         if conn is not None:
             conn.close()
 
-
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
     slack_msg = f"====CURRENT BOARD===\n"
     board_state = []
@@ -549,8 +556,12 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
             if board_state[board_index] != TicTacMove.OPEN:
                 respond("Try again - that space is already taken.")
             else:
-                curr_move = get_and_update_curr_move_team()
-                board_state[board_index] = curr_move
+                curr_team = get_and_update_curr_move_team()
+                board_state[board_index] = curr_team
+
+                # get next team to use in Slack msg response
+                next_team = VoteType.get_opposite(curr_team)
+                next_team_str = f"Next move will be for team `{convert_move_enum_to_str(next_team)}`\n"
 
                 # winner currently not used because X and O team assignments don't matter
                 whether_won, winner = check_for_win(board_state)
@@ -561,12 +572,14 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     reset_board_state()
                     # print a blank board to the chat
                     slack_msg += f"<@{player}> won the previous game.\n"
+                    slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
                 else:
                     slack_msg += f"Last move made by <@{player}>\n"
+                    slack_msg += next_team_str
                     # add a tile and print out the new board
-                    update_board_state(row_num, col_num, curr_move)
+                    update_board_state(row_num, col_num, curr_team)
                     board_str = get_board_str(board_state)
                     slack_msg += board_str
                     respond(slack_msg, response_type="in_channel")
