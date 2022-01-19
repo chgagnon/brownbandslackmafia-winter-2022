@@ -293,7 +293,7 @@ def handle_tic_tac_scoreboard(ack, respond, command):
         row = cur.fetchone()
 
         while row is not None:
-            target_str = f"*PLAYER:* {row[0]}"
+            target_str = f"*PLAYER:* <@{row[0]}>"
             numvotes_str = f"| *WINS:* {row[1]}"
             slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
             row = cur.fetchone() 
