@@ -47,7 +47,7 @@ KILL_STR = "kill"
 BOARD_HEIGHT = 3
 BOARD_WIDTH = 3
 # backticks escape Slack markdown formatting (by formatting as "code")
-BLANK_BOARD_STR = "This is a new game.\n`_|_|_`\n`_|_|_`\n` | | `"
+BLANK_BOARD_STR = "`_|_|_`\n`_|_|_`\n` | | `"
 TIC_TAC_CHANNEL_NAME = "tic-tac-toe-test"
 TIE_STR = "TIE"
 
@@ -578,7 +578,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     # reset the (database) board state
                     reset_board_state()
                     # print a blank board to the chat
-                    slack_msg += f"<@{player}> won the previous game.\n"
+                    slack_msg += f"This is a new game - <@{player}> won the previous game.\n"
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
