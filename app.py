@@ -560,7 +560,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                 board_state[board_index] = curr_team
 
                 # get next team to use in Slack msg response
-                next_team = VoteType.get_opposite(curr_team)
+                next_team = TicTacMove.get_opposite(curr_team)
                 next_team_str = f"Next move will be for team `{convert_move_enum_to_str(next_team)}`\n"
 
                 # winner currently not used because X and O team assignments don't matter
