@@ -630,6 +630,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     reset_board_state()
 
                     slack_msg += f"The previous game ended in a tie - nobody won.\n"
+                    slack_msg += f"Last move made by <@{player}\n"
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
