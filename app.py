@@ -467,7 +467,8 @@ def get_board_str(board_state):
             curr_row_str += convert_move_enum_to_str(board_state[j + BOARD_WIDTH * i])
             curr_row_str += "|"
         # replace last-column | with \n
-        curr_row_str[-1] = "\n"
+        curr_row_str = curr_row_str[:-1]
+        curr_row_str += "\n"
         board_str += "`" + curr_row_str + "`"
     return board_str
 
