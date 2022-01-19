@@ -38,8 +38,10 @@ KILL_STR = "kill"
 # for tic tac toe game
 BOARD_HEIGHT = 3
 BOARD_WIDTH = 3
-BLANK_BOARD_STR = "This is a new game.\n`_|_|_\n_|_|_\n | | `"
+# backticks escape Slack markdown formatting (by formatting as "code")
+BLANK_BOARD_STR = "This is a new game.\n`_|_|_`\n`_|_|_`\n` | | `"
 TIC_TAC_CHANNEL_NAME = "tic-tac-toe-test"
+
 
 def test_database_connection():
     """Connect to the PostgreSQL database server"""
@@ -246,9 +248,12 @@ def handle_tictacmove(ack, respond, command):
                 player = command["user_id"]
                 make_tic_tac_toe_move(player, row_num, col_num, respond)
             else:
-                respond("Try again - your move row and column were too large or too small.")
+                respond(
+                    "Try again - your move row and column were too large or too small."
+                )
         else:
             respond("Try again - you didn't provide a move in proper format.")
+
 
 # used for debugging the reset function - this slack command
 # will be disabled before the app is put to use by the public
@@ -261,6 +266,7 @@ def handle_tic_tac_restart(ack, respond, command):
         reset_board_state()
         respond("Board should be reset now.")
 
+
 def convert_move_str_to_enum(move_str):
     if move_str == "OPEN":
         return TicTacMove.OPEN
@@ -269,7 +275,9 @@ def convert_move_str_to_enum(move_str):
     elif move_str == "O":
         return TicTacMove.O
     else:
-        print(f"ERROR: move_str was none of the permitted types - it was instead {move_str}")
+        print(
+            f"ERROR: move_str was none of the permitted types - it was instead {move_str}"
+        )
 
 
 def update_curr_move_team(team_letter_str):
@@ -452,15 +460,16 @@ def convert_move_enum_to_str(tile):
 
 
 def get_board_str(board_state):
-    board_tiles = []
-    for index, tile in enumerate(board_state):
-        board_tiles.append(convert_move_enum_to_str(tile))
-        if index in [2, 5, 8]:
-            print("board_tiles is", board_tiles)
-            board_tiles[-1] += "\n"
-    separator = "|"
-    board_str = separator.join(board_tiles)
-    return "`" + board_str + "`"
+    board_str = ""
+    for i in range(BOARD_HEIGHT):
+        curr_row_str = ""
+        for j in range(BOARD_WIDTH):
+            curr_row_str += convert_move_enum_to_str(board_state[j + BOARD_WIDTH * i])
+            curr_row_str += "|"
+        # replace last-column | with \n
+        curr_row_str[-1] = "\n"
+        board_str += "`" + curr_row_str + "`"
+    return board_str
 
 
 def reset_board_state():
@@ -495,9 +504,7 @@ def reset_board_state():
         # commit the changes to the database
         conn.commit()
 
-        print(
-            "Resetting board state for a new game"
-        )
+        print("Resetting board state for a new game")
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
