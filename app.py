@@ -49,6 +49,7 @@ BOARD_WIDTH = 3
 # backticks escape Slack markdown formatting (by formatting as "code")
 BLANK_BOARD_STR = "This is a new game.\n`_|_|_`\n`_|_|_`\n` | | `"
 TIC_TAC_CHANNEL_NAME = "tic-tac-toe-test"
+TIE_STR = "TIE"
 
 
 def test_database_connection():
@@ -348,33 +349,39 @@ def get_and_update_curr_move_team():
 # returns (whether_game_won, winner)
 # winner is arbitrary if whether_game_won is False
 def whether_triple(board_state, start_index, offset):
-    return (
-        (board_state[start_index] != TicTacMove.OPEN)
+    if ((board_state[start_index] != TicTacMove.OPEN)
         and (board_state[start_index] == board_state[start_index + offset])
-        and (board_state[start_index] == board_state[start_index + 2 * offset])
-    ), board_state[start_index]
-
+        and (board_state[start_index] == board_state[start_index + 2 * offset])):
+        return True, board_state[start_index]
+    else:
+        for tile in board_state:
+            if tile == TicTacMove.OPEN:
+                return False, TicTacMove.OPEN
+        # in this case, there's no winner, and the board is full
+        return TIE_STR, TicTacMove.OPEN
 
 # lst_of_checked_triples is a list of the form (whether_game_won, winner)
 # in tic tac toe, it is NOT possible for more than one player to be a winner at the same time
 def get_winner(lst_of_checked_triples):
     for result in lst_of_checked_triples:
+        # valid for True case and also for TIE case (TIE_STR is truthy)
         if result[0]:
             return result
-    return False, TicTacMove.OPEN
+    return False, TicTacMove.OPEN    
 
 
-def vert_and_horiz_check(board_state, offset):
+def check_for_vert_win(board_state):
+    offset = 3
+    # vert win states start from tiles 0, 1, 2
     lst_to_check = [whether_triple(board_state, i, offset) for i in range(3)]
     return get_winner(lst_to_check)
 
 
-def check_for_vert_win(board_state):
-    return vert_and_horiz_check(board_state, 3)
-
-
 def check_for_horiz_win(board_state):
-    return vert_and_horiz_check(board_state, 1)
+    offset = 1
+    # horiz win states start from tiles 0, 3, 6
+    lst_to_check = [whether_triple(board_state, i, offset) for i in [0, 3, 6]]
+    return get_winner(lst_to_check)
 
 
 def check_for_diag_win(board_state):
@@ -565,13 +572,24 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
 
                 # winner currently not used because X and O team assignments don't matter
                 whether_won, winner = check_for_win(board_state)
-                if whether_won:
+                if whether_won == True:
                     # record a win for the current player
                     record_win(player)
                     # reset the (database) board state
                     reset_board_state()
                     # print a blank board to the chat
                     slack_msg += f"<@{player}> won the previous game.\n"
+                    slack_msg += next_team_str
+                    slack_msg += BLANK_BOARD_STR
+                    respond(slack_msg, response_type="in_channel")
+                elif whether_won == TIE_STR:
+                    # I know using a string as an third boolean is very
+                    # silly - I'm sorry
+
+                    # reset the (database) board state
+                    reset_board_state()
+                    
+                    slack_msg += f"The previous gaame ended in a tie - nobody won.\n"
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
