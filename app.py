@@ -1,6 +1,7 @@
 import os
 from shutil import move
 from tracemalloc import start
+from urllib import response
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 import re
@@ -275,6 +276,35 @@ def handle_tic_tac_restart(ack, respond, command):
         reset_board_state()
         respond("Board should be reset now.")
 
+@app.command("/tictacscoreboard")
+def handle_tic_tac_scoreboard(ack, respond, command):
+    ack()
+    # allow in any channel
+    sql = """SELECT player_id, num_wins from tic_tac_win ORDER BY num_wins DESC"""
+    slack_msg = "===CURRENT TIC TAC TOE SCOREBOARD===\n"
+    try:
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+
+        print(f"Getting win count")
+
+        row = cur.fetchone()
+
+        while row is not None:
+            target_str = f"*PLAYER:* {row[0]}"
+            numvotes_str = f"| *WINS:* {row[1]}"
+            slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
+            row = cur.fetchone() 
+
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+    respond(slack_msg)
 
 def convert_move_str_to_enum(move_str):
     if move_str == "OPEN":
