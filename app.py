@@ -467,6 +467,8 @@ def reset_board_state():
     print("Reached beginning of func reset_board_state()")
     conn = None
     values_str = "(%s, %s)," * BOARD_WIDTH * BOARD_HEIGHT
+    # remove final comma
+    values_str = values_str[:-1]
     sql = (
         """INSERT INTO tic_tac_board(tile_state, square_id)
              VALUES """
