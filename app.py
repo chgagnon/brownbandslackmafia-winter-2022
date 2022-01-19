@@ -29,6 +29,7 @@ class TicTacMove(Enum):
         else:
             return TicTacMove.OPEN
 
+
 logging.basicConfig(level=logging.INFO)
 
 # usernames are received by the server as <123ABC>
@@ -276,6 +277,7 @@ def handle_tic_tac_restart(ack, respond, command):
         reset_board_state()
         respond("Board should be reset now.")
 
+
 @app.command("/tictacscoreboard")
 def handle_tic_tac_scoreboard(ack, respond, command):
     ack()
@@ -296,7 +298,7 @@ def handle_tic_tac_scoreboard(ack, respond, command):
             target_str = f"*PLAYER:* <@{row[0]}>"
             numvotes_str = f"| *WINS:* {row[1]}"
             slack_msg += target_str.ljust(30) + numvotes_str.rjust(14) + "\n"
-            row = cur.fetchone() 
+            row = cur.fetchone()
 
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -305,6 +307,7 @@ def handle_tic_tac_scoreboard(ack, respond, command):
         if conn is not None:
             conn.close()
     respond(slack_msg)
+
 
 def convert_move_str_to_enum(move_str):
     if move_str == "OPEN":
@@ -337,6 +340,7 @@ def update_curr_move_team(team_letter_str):
     finally:
         if conn is not None:
             conn.close()
+
 
 # looks up whether the current turn is for O or X
 # then sets the other team to be the team for the next turn
@@ -379,9 +383,11 @@ def get_and_update_curr_move_team():
 # returns (whether_game_won, winner)
 # winner is arbitrary if whether_game_won is False
 def whether_triple(board_state, start_index, offset):
-    if ((board_state[start_index] != TicTacMove.OPEN)
+    if (
+        (board_state[start_index] != TicTacMove.OPEN)
         and (board_state[start_index] == board_state[start_index + offset])
-        and (board_state[start_index] == board_state[start_index + 2 * offset])):
+        and (board_state[start_index] == board_state[start_index + 2 * offset])
+    ):
         return True, board_state[start_index]
     else:
         for tile in board_state:
@@ -390,6 +396,7 @@ def whether_triple(board_state, start_index, offset):
         # in this case, there's no winner, and the board is full
         return TIE_STR, TicTacMove.OPEN
 
+
 # lst_of_checked_triples is a list of the form (whether_game_won, winner)
 # in tic tac toe, it is NOT possible for more than one player to be a winner at the same time
 def get_winner(lst_of_checked_triples):
@@ -397,7 +404,7 @@ def get_winner(lst_of_checked_triples):
         # valid for True case and also for TIE case (TIE_STR is truthy)
         if result[0]:
             return result
-    return False, TicTacMove.OPEN    
+    return False, TicTacMove.OPEN
 
 
 def check_for_vert_win(board_state):
@@ -560,6 +567,7 @@ def reset_board_state():
         if conn is not None:
             conn.close()
 
+
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
     slack_msg = f"====CURRENT BOARD===\n"
     board_state = []
@@ -608,7 +616,9 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     # reset the (database) board state
                     reset_board_state()
                     # print a blank board to the chat
-                    slack_msg += f"This is a new game - <@{player}> won the previous game.\n"
+                    slack_msg += (
+                        f"This is a new game - <@{player}> won the previous game.\n"
+                    )
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
@@ -618,7 +628,7 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
 
                     # reset the (database) board state
                     reset_board_state()
-                    
+
                     slack_msg += f"The previous gaame ended in a tie - nobody won.\n"
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
