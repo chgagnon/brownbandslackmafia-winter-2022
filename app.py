@@ -271,7 +271,7 @@ def handle_tictacmove(ack, respond, command):
 @app.command("/restart-tic-tac")
 def handle_tic_tac_restart(ack, respond, command):
     ack()
-    if command["channel_name"] != TIC_TAC_CHANNEL_NAME:
+    if command["channel_name"] not in TIC_TAC_CHANNEL_NAMES:
         respond("You can't do that in this channel.")
     else:
         reset_board_state()
