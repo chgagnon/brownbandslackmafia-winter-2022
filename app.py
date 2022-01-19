@@ -463,14 +463,14 @@ def convert_move_enum_to_str(tile):
 def get_board_str(board_state):
     board_str = ""
     for i in range(BOARD_HEIGHT):
-        curr_row_str = ""
+        curr_row_str = "`"
         for j in range(BOARD_WIDTH):
             curr_row_str += convert_move_enum_to_str(board_state[j + BOARD_WIDTH * i])
             curr_row_str += "|"
-        # replace last-column | with \n
+        # replace last-column | with `\n
         curr_row_str = curr_row_str[:-1]
-        curr_row_str += "\n"
-        board_str += "`" + curr_row_str + "`"
+        curr_row_str += "`\n"
+        board_str += curr_row_str
     return board_str
 
 
