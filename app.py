@@ -471,7 +471,7 @@ def reset_board_state():
         """INSERT INTO tic_tac_board(tile_state, square_id)
              VALUES """
         + values_str
-        + """ON CONFLICT (square_id)
+        + """ ON CONFLICT (square_id)
              DO UPDATE
                 SET tile_state = excluded.tile_state;"""
     )
