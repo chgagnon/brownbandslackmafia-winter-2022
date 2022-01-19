@@ -470,7 +470,7 @@ def reset_board_state():
     # remove final comma
     values_str = values_str[:-1]
     sql = (
-        """INSERT INTO tic_tac_board(tile_state, square_id)
+        """INSERT INTO tic_tac_board(square_id, tile_state)
              VALUES """
         + values_str
         + """ ON CONFLICT (square_id)
