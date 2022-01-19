@@ -299,12 +299,13 @@ def update_curr_move_team(team_letter_str):
         if conn is not None:
             conn.close()
 
-
+# looks up whether the current turn is for O or X
+# then sets the other team to be the team for the next turn
 def get_and_update_curr_move_team():
     conn = None
     curr_team_str = None
     try:
-        """look up whether it is a turn for team X or team O and then update it"""
+        """look up whether it is a turn for team X or team O"""
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
         cur.execute(f"SELECT * FROM tic_tac_curr_team;")
