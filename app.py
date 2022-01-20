@@ -401,8 +401,12 @@ def whether_triple(board_state, start_index, offset):
 # in tic tac toe, it is NOT possible for more than one player to be a winner at the same time
 def get_winner(lst_of_checked_triples):
     for result in lst_of_checked_triples:
-        # valid for True case and also for TIE case (TIE_STR is truthy)
-        if result[0]:
+        # check if there are any wins
+        if result[0] == True:
+            return result
+    for result in lst_of_checked_triples:
+        # now check if there is a tie (only valid when there is no win)
+        if result[0] == TIE_STR:
             return result
     return False, TicTacMove.OPEN
 
