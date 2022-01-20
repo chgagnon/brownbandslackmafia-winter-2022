@@ -570,6 +570,7 @@ def reset_board_state():
 
 def make_tic_tac_toe_move(player, row_num, col_num, respond):
     slack_msg = f"====CURRENT BOARD===\n"
+    last_move_by_str = f"Last move made by <@{player}>\n"
     board_state = []
     board_index = row_num * BOARD_WIDTH + col_num
     conn = None
@@ -630,12 +631,12 @@ def make_tic_tac_toe_move(player, row_num, col_num, respond):
                     reset_board_state()
 
                     slack_msg += f"The previous game ended in a tie - nobody won.\n"
-                    slack_msg += f"Last move made by <@{player}\n"
+                    slack_msg += last_move_by_str
                     slack_msg += next_team_str
                     slack_msg += BLANK_BOARD_STR
                     respond(slack_msg, response_type="in_channel")
                 else:
-                    slack_msg += f"Last move made by <@{player}>\n"
+                    slack_msg += last_move_by_str
                     slack_msg += next_team_str
                     # add a tile and print out the new board
                     update_board_state(row_num, col_num, curr_team)
