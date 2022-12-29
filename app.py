@@ -165,8 +165,10 @@ def send_database_state_to_slack():
 
 # Initializes your app with your bot token and socket mode handler
 app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET"),
+    # This is the Slack Bot Token (listed at OAuth and Permissions)
+    token="xoxb-4392981149350-4577768673955-Qk9XMN69TGodJKmZhqAI2kzB",
+    # This is the app sigining secret (listed at Basic Information)
+    signing_secret="50cd846215d896a85698c83a642ab959",
 )
 
 
